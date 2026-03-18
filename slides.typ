@@ -189,33 +189,42 @@ $ P(A arrow.l.r B) != P(A arrow.r B) times P(B arrow.r A) $
 
 == Datos sintéticos
 
-- 100 usuarios, 6 dimensiones (belleza, poder adq., extroversión, intelectualidad, aventura, romanticismo)
-- Características con norma variable — algunos tienen "más de todo"
+- *200 usuarios*, 6 dimensiones (belleza, poder adq., extroversión, intelectualidad, aventura, romanticismo)
+- Características con norma variable — algunos tienen "más de todo" ($r_"norma" = 0.92$ con atractivo recibido)
 - Preferencias normalizadas (dirección pura) con componente de atractivo universal
-- Probabilidades estimadas con Logistic Regression y Gradient Boosted Trees
+- AUC $approx 0.74$ con Logistic Regression y Gradient Boosted Trees
 
-== Comparación de algoritmos
+== Comparación principal (200 usuarios)
 
-// Estos gráficos se generan desde el notebook
-// #image("img/matching_comparison_table.svg")
-// #image("img/matching_graph.svg")
+#image("img/matching_bar_chart.svg")
 
-_Slides de respaldo — se llenan con output del notebook_
+== Comparación completa (20 usuarios)
+
+#image("img/matching_results_small_table.svg")
+
+Max Weight supera el bipartito porque no está restringido a grupos.
+Fuerza bruta converge al óptimo bipartito en $<0.2$s sobre 20 usuarios.
+
+== Matchings en el grafo
+
+#image("img/matching_comparison.svg")
 
 == Predicciones vs. Realidad
 
-¿Qué pasa si optimizamos con predicciones imperfectas?
+#image("img/pred_vs_real_comparison.svg")
+
+== Predicciones vs. Realidad — Pérdida
+
+Con 200 usuarios:
+
+- *Gale-Shapley*: pierde ~6% de valor real
+- *Greedy*: pierde ~10%
+- *Scipy bipartito*: pierde ~14%
+- *Max Weight*: pierde ~16%
 
 #pause
 
-- Todos los algoritmos pierden valor real al usar predicciones
-- Pero la pérdida *no es uniforme*:
-  - *Greedy*: ~15% de pérdida (el más robusto)
-  - *Max Weight*: ~26% de pérdida (el más sensible)
-
-#pause
-
-*Paradoja*: el algoritmo óptimo _en teoría_ es el que más sufre con predicciones imperfectas, porque confía más en los pesos exactos.
+*Paradoja*: el óptimo global es el más frágil ante estimaciones imperfectas.
 
 == Insights principales
 
