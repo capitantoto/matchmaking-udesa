@@ -297,21 +297,21 @@ En grafos generales: blossom de Edmonds (más lento, no necesario aquí).]
 #pause
 
 #text(size: 16pt)[
-  ¿Por qué no simplemente enumerar todos los matchings posibles? Para $n = 250$ usuarios por grupo:
+  ¿Por qué no simplemente enumerar todos los matchings posibles? Para $n = 500$ usuarios por grupo:
   #table(
     columns: (auto, auto, auto),
     inset: 6pt,
     align: (left, center, left),
     table.header([*Método*], [*Operaciones*], [*Factible?*]),
-    [Húngaro],  [$250^3 approx 1.6 times 10^7$], [Sí — milisegundos],
-    [Exhaustivo], [$250! approx 10^{491}$],        [No — el universo tiene $approx 10^{80}$ átomos],
+    [Húngaro],    [$500^3 approx 1.25 times 10^8$], [Sí — segundos],
+    [Exhaustivo], [$500! approx 10^{1134}$],         [No — el universo tiene $approx 10^{80}$ átomos],
   )
 ]
 
 == Comparación de enfoques
 
 #table(
-  columns: (auto, auto, auto, auto),
+  columns: (1fr, 1fr, 1fr, 1fr),
   inset: 8pt,
   align: (left, center, center, center),
   table.header(
@@ -335,12 +335,12 @@ En grafos generales: blossom de Edmonds (más lento, no necesario aquí).]
 
 == Datos sintéticos
 
-- *500 usuarios*, 6 dimensiones (belleza, poder adq., extroversión, intelectualidad, aventura, romanticismo)
+- *1000 usuarios*, 6 dimensiones (belleza, poder adq., extroversión, intelectualidad, aventura, romanticismo)
 - Características con norma variable — algunos tienen "más de todo" ($r_"norma" = 0.92$ con atractivo recibido)
 - Preferencias normalizadas (dirección pura) con componente de atractivo universal
 - AUC $approx 0.74$ con Logistic Regression y Gradient Boosted Trees
 
-== Comparación principal (500 usuarios)
+== Comparación principal (1000 usuarios)
 
 #table(
   columns: (2fr, 1fr, 1fr, 1fr, 1fr),
@@ -349,15 +349,15 @@ En grafos generales: blossom de Edmonds (más lento, no necesario aquí).]
   table.header(
     [*Algoritmo*], [*Pares*], [*Peso*], [*Tiempo*], [*% óptimo*],
   ),
-  [Gale-Shapley],    [250], [70.8], [4ms],   [92.2%],
-  [Greedy],          [250], [72.9], [26ms],  [94.9%],
-  [Max Weight],      [250], [76.8], [12.3s], [100%],
-  [Scipy bipartito], [250], [76.8], [3ms],   [100%],
+  [Gale-Shapley],    [500], [137.8], [20ms],  [91.2%],
+  [Greedy],          [500], [142.9], [148ms], [94.6%],
+  [Max Weight],      [500], [151.1], [107s],  [100%],
+  [Scipy bipartito], [500], [151.1], [13ms],  [100%],
 )
 
-== Comparación completa (30 usuarios)
+== Comparación completa (40 usuarios)
 
-Max Weight, Scipy y Fuerza bruta coinciden (todos óptimos); GS pierde ~6%.
+Max Weight, Scipy y Fuerza bruta coinciden (todos óptimos); GS pierde ~5%.
 
 #table(
   columns: (2fr, 1fr, 1fr, 1fr, 1fr),
@@ -366,24 +366,24 @@ Max Weight, Scipy y Fuerza bruta coinciden (todos óptimos); GS pierde ~6%.
   table.header(
     [*Algoritmo*], [*Pares*], [*Peso*], [*Tiempo*], [*% óptimo*],
   ),
-  [Gale-Shapley],    [15], [2.600], [< 0.1ms], [94.1%],
-  [Greedy],          [15], [2.752], [< 0.1ms], [99.6%],
-  [Max Weight],      [15], [2.763], [3ms],      [100%],
-  [Scipy bipartito], [15], [2.763], [< 0.1ms], [100%],
-  [Fuerza bruta],    [15], [2.763], [2.1s],     [100%],
+  [Gale-Shapley],    [20], [4.432], [< 0.1ms], [94.6%],
+  [Greedy],          [20], [4.485], [< 0.1ms], [95.7%],
+  [Max Weight],      [20], [4.687], [6ms],      [100%],
+  [Scipy bipartito], [20], [4.687], [< 0.1ms], [100%],
+  [Fuerza bruta],    [20], [4.687], [7.3s],     [100%],
 )
 
 == Matchings en el grafo — Gale-Shapley
 
-#align(center)[#image("img/matching_gs.svg", height: 80%)]
+#image("img/matching_gs.svg", width: 100%)
 
 == Matchings en el grafo — Greedy
 
-#align(center)[#image("img/matching_greedy.svg", height: 80%)]
+#image("img/matching_greedy.svg", width: 100%)
 
 == Matchings en el grafo — Max Weight
 
-#align(center)[#image("img/matching_mwm.svg", height: 80%)]
+#image("img/matching_mwm.svg", width: 100%)
 
 == Predicciones vs. Realidad
 
@@ -391,11 +391,11 @@ Max Weight, Scipy y Fuerza bruta coinciden (todos óptimos); GS pierde ~6%.
 
 == Predicciones vs. Realidad — Pérdida
 
-Con 500 usuarios (grafo bipartito, heterosexual):
+Con 1000 usuarios (grafo bipartito, heterosexual):
 
-- *Gale-Shapley*: pierde ~7% de valor real
-- *Greedy*: pierde ~6%
-- *Max Weight / Scipy*: pierde ~11%
+- *Gale-Shapley*: pierde ~11% de valor real
+- *Greedy*: pierde ~9%
+- *Max Weight / Scipy*: pierde ~12%
 
 #pause
 
