@@ -68,11 +68,16 @@ Cuando $"ctr"_A times "cpc"_A > "ctr"_B times "cpc"_B$ consistentemente, A se ll
 
 == Carreras de caballos: Kelly Criterion
 
-¿Cuánto apostar si creemos conocer la probabilidad de ganar?
+¿Cuánto apostar si creemos conocer la probabilidad de ganar? #link("https://doi.org/10.1002/j.1538-7305.1956.tb03809.x")[(Kelly, 1956)]
 
 $ f^* = frac(b p - q, b) $
 
-donde $b$ = odds, $p$ = prob. estimada, $q = 1-p$
+#text(size: 16pt)[
+- $f^*$: fracción del capital a apostar
+- $b$: ganancia neta por unidad apostada (_odds_ del bookmaker menos 1)
+- $p$: probabilidad estimada de ganar
+- $q = 1 - p$: probabilidad estimada de perder
+]
 
 #pause
 
@@ -82,7 +87,7 @@ donde $b$ = odds, $p$ = prob. estimada, $q = 1-p$
 
 #image("img/kelly.svg")
 
-_(Benter):_ sobreestimar una chance real de 20% a 30% cambia drásticamente la fracción óptima de apuesta.
+Sobreestimar la ventaja por más de un factor de 2 causa *crecimiento negativo* del capital — y es fácil hacerlo en la práctica. #link("https://gwern.net/doc/statistics/decision/1994-benter.pdf")[(Benter, 1994)]
 
 // =============================================================================
 // SECCIÓN 3: Matchmaking
@@ -126,6 +131,16 @@ $ P(A arrow.l.r B) != P(A arrow.r B) times P(B arrow.r A) $
 - Optimiza estabilidad, no bienestar global
 - El matching estable puede ser muy desigual
 
+== Greedy Matching
+
+- Ordenar aristas por $P(A arrow.l.r B)$ descendente
+- Agregar si ambos nodos están libres
+- Garantiza $>= 1/2$ del óptimo (_1/2-aproximación_)
+
+#pause
+
+*Simple e intuitivo*, pero puede "gastar" nodos muy demandados en pares buenos-pero-no-óptimos
+
 == Maximum Weight Matching
 
 - Grafo completo ponderado: peso de cada arista = $P(A arrow.l.r B)$
@@ -157,6 +172,7 @@ $ P(A arrow.l.r B) != P(A arrow.r B) times P(B arrow.r A) $
     [*Algoritmo*], [*Optimiza*], [*Óptimo?*], [*Práctico?*],
   ),
   [Gale-Shapley], [Estabilidad], [Sí (estab.)], [Difícil en dating],
+  [Greedy], [Bienestar local], [$>= 1/2$ óptimo], [Sí, muy rápido],
   [Max Weight], [Bienestar global], [Sí], [Sí],
   [Fuerza bruta], [Configurable], [Aprox.], [Lento],
 )
@@ -173,10 +189,10 @@ $ P(A arrow.l.r B) != P(A arrow.r B) times P(B arrow.r A) $
 
 == Datos sintéticos
 
-- 100 usuarios, 6 dimensiones
-- Vectores de características y preferencias en $[0, 1]$
+- 100 usuarios, 6 dimensiones (belleza, poder adq., extroversión, intelectualidad, aventura, romanticismo)
+- Características con norma variable — algunos tienen "más de todo"
+- Preferencias normalizadas (dirección pura) con componente de atractivo universal
 - Probabilidades estimadas con Logistic Regression y Gradient Boosted Trees
-- Grafo completo de 100 nodos con pesos = $P(A arrow.l.r B)$ estimada
 
 == Comparación de algoritmos
 
@@ -186,10 +202,28 @@ $ P(A arrow.l.r B) != P(A arrow.r B) times P(B arrow.r A) $
 
 _Slides de respaldo — se llenan con output del notebook_
 
-== Insight principal
+== Predicciones vs. Realidad
 
-El matching que maximiza el bienestar global puede dejar afuera al par con mayor probabilidad individual.
+¿Qué pasa si optimizamos con predicciones imperfectas?
 
 #pause
 
-*Esto es la esencia de la toma de decisiones en data science*: optimizar el sistema completo, no cada componente por separado.
+- Todos los algoritmos pierden valor real al usar predicciones
+- Pero la pérdida *no es uniforme*:
+  - *Greedy*: ~15% de pérdida (el más robusto)
+  - *Max Weight*: ~26% de pérdida (el más sensible)
+
+#pause
+
+*Paradoja*: el algoritmo óptimo _en teoría_ es el que más sufre con predicciones imperfectas, porque confía más en los pesos exactos.
+
+== Insights principales
+
++ El matching que maximiza el bienestar global puede dejar afuera al par con mayor probabilidad individual.
+
++ Los algoritmos más "ambiciosos" son más frágiles ante errores de estimación.
+
+#pause
+
+*Esto es la esencia de la toma de decisiones en data science*: optimizar el sistema completo, no cada componente por separado — pero siendo consciente de la calidad de nuestras estimaciones.
+
