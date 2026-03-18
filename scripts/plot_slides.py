@@ -46,9 +46,9 @@ def plot_kelly():
     ax1.plot(K_arr, G_arr, color="#2196F3", linewidth=2.5)
 
     ann = [
-        (K_pts[0], g_vals[0]*100, "K = 6.25% → G = +0.74%/ap.",   0.04,  1.2),
-        (K_pts[1], g_vals[1]*100, "K = 12.5% → G = +0.12%/ap.",   0.04,  2.2),
-        (K_pts[2], g_vals[2]*100, "K = 37.5% → G = −12.3%/ap.", -0.26,  6.5),
+        (K_pts[0], g_vals[0]*100, "K = 6.25% → G = +0.74%/ap.",  -0.05,  2.3),
+        (K_pts[1], g_vals[1]*100, "K = 12.5% → G = +0.12%/ap.",   0.15,  0.5),
+        (K_pts[2], g_vals[2]*100, "K = 37.5% → G = −12.3%/ap.",  -0.26,  6.5),
     ]
     for (K_val, G_pct, text, dx, dy), color in zip(ann, colors):
         ax1.plot(K_val, G_pct, "o", color=color, markersize=12, zorder=5)
