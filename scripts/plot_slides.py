@@ -9,9 +9,9 @@ IMG_DIR.mkdir(exist_ok=True)
 
 plt.rcParams.update({
     "figure.figsize": (10, 6),
-    "font.size": 16,
-    "axes.titlesize": 20,
-    "axes.labelsize": 18,
+    "font.size": 32,
+    "axes.titlesize": 40,
+    "axes.labelsize": 36,
     "lines.linewidth": 2.5,
     "figure.facecolor": "white",
 })
@@ -54,7 +54,7 @@ def plot_kelly():
         ax1.plot(K_val, G_pct, "o", color=color, markersize=12, zorder=5)
         ax1.annotate(text, xy=(K_val, G_pct),
                      xytext=(K_val + dx, G_pct + dy),
-                     fontsize=12, color=color,
+                     fontsize=24, color=color,
                      arrowprops=dict(arrowstyle="->", color=color, lw=1.5))
 
     ax1.set_xlabel("Fracción apostada $K$")
