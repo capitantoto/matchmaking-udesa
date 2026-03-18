@@ -34,7 +34,7 @@ def plot_kelly():
     colors   = ["#4CAF50", "#FF9800", "#F44336"]
     g_vals   = [G(k) for k in K_pts]
 
-    fig, ax1 = plt.subplots(figsize=(10, 6))
+    fig, ax1 = plt.subplots(figsize=(16, 9))
 
     # ── G(K) vs K ─────────────────────────────────────────────────────────────
     K_arr = np.linspace(1e-4, 0.52, 600)
@@ -51,15 +51,15 @@ def plot_kelly():
         (K_pts[2], g_vals[2]*100, "K = 37.5% → G = −12.3%/ap.",  -0.26,  6.5),
     ]
     for (K_val, G_pct, text, dx, dy), color in zip(ann, colors):
-        ax1.plot(K_val, G_pct, "o", color=color, markersize=12, zorder=5)
+        ax1.plot(K_val, G_pct, "o", color=color, markersize=14, zorder=5)
         ax1.annotate(text, xy=(K_val, G_pct),
                      xytext=(K_val + dx, G_pct + dy),
                      fontsize=24, color=color,
-                     arrowprops=dict(arrowstyle="->", color=color, lw=1.5))
+                     arrowprops=dict(arrowstyle="->", color=color, lw=2.0))
 
     ax1.set_xlabel("Fracción apostada $K$")
-    ax1.set_ylabel("Tasa de crecimiento $G(K)$  (% por apuesta)")
-    ax1.set_title(f"Crecimiento esperado — c real = {c_real:.0%},  dividendo = {dividendo}")
+    ax1.set_ylabel("$G(K)$  (% por apuesta)")
+    ax1.set_title(f"Crecimiento esperado  (c = {c_real:.0%}, div = {dividendo})")
     ax1.set_xlim(0, 0.52)
     ax1.set_ylim(-20, 4)
     ax1.grid(True, alpha=0.3)
