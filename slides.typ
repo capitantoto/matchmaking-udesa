@@ -279,6 +279,11 @@ Garantiza *estabilidad*: ningún par rechazado se preferiría mutuamente al par 
 
 *Insight contraintuitivo*: el matching óptimo global puede NO incluir el par con mayor probabilidad individual
 
+#pause
+
+#text(size: 16pt)[En grafos bipartitos: *algoritmo húngaro* @kuhn1955 — O($n^3$), exacto. \
+En grafos generales: blossom de Edmonds (más lento, no necesario aquí).]
+
 == Fuerza bruta con `scipy.minimize`
 
 - Formulación genérica: optimización combinatoria relajada
