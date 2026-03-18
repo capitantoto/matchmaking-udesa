@@ -18,71 +18,52 @@ plt.rcParams.update({
 
 
 def plot_kelly():
-    """Kelly criterion: fracción óptima vs. probabilidad estimada.
+    """Kelly criterion — dos paneles: G(K) y trayectorias de capital.
 
-    f* = (b*p - q) / b  donde q = 1-p, b = odds (pago neto por unidad apostada).
-    Ejemplo: caballo con odds 4:1 (b=4), prob real ~20%.
+    G(K) = c·ln(1 + (div-1)·K) + (1-c)·ln(1-K)  tasa de crecimiento log. esperada
+    dividendo = 5, c_real = 0.25
+    K values: 6.25% (óptimo), 12.5% (c_est=30%), 37.5% (c_est=50%)
     """
-    b = 4  # odds 4:1
-    p = np.linspace(0.01, 0.99, 500)
-    q = 1 - p
-    f_star = (b * p - q) / b
-    f_star = np.clip(f_star, 0, None)  # no apostar fracción negativa
+    dividendo = 5
+    c_real = 0.25
 
-    fig, ax = plt.subplots()
-    ax.plot(p, f_star, color="#2196F3", label=r"$f^* = \frac{bp - q}{b}$, $b=4$")
-    ax.set_xlabel("Probabilidad estimada $\\hat{p}$")
-    ax.set_ylabel("Fracción óptima de apuesta $f^*$")
-    ax.set_title("Kelly Criterion — Sensibilidad a la estimación")
+    def G(K):
+        return c_real * np.log(1 + (dividendo - 1) * K) + (1 - c_real) * np.log(1 - K)
 
-    # Marcar p_real = 0.20
-    p_real = 0.20
-    f_real = max((b * p_real - (1 - p_real)) / b, 0)
-    ax.plot(p_real, f_real, "o", color="#4CAF50", markersize=12, zorder=5)
-    ax.annotate(
-        f"Real: p={p_real:.0%}, f*={f_real:.0%}",
-        xy=(p_real, f_real),
-        xytext=(p_real + 0.08, f_real + 0.12),
-        fontsize=14,
-        arrowprops=dict(arrowstyle="->", color="#4CAF50"),
-        color="#4CAF50",
-    )
+    K_pts    = [0.0625,   0.125,   0.375  ]
+    colors   = ["#4CAF50", "#FF9800", "#F44336"]
+    g_vals   = [G(k) for k in K_pts]
 
-    # Marcar p_sobreestimada = 0.30
-    p_over = 0.30
-    f_over = max((b * p_over - (1 - p_over)) / b, 0)
-    ax.plot(p_over, f_over, "o", color="#F44336", markersize=12, zorder=5)
-    ax.annotate(
-        f"Sobreestimada: p={p_over:.0%}, f*={f_over:.0%}",
-        xy=(p_over, f_over),
-        xytext=(p_over + 0.06, f_over + 0.10),
-        fontsize=14,
-        arrowprops=dict(arrowstyle="->", color="#F44336"),
-        color="#F44336",
-    )
+    fig, ax1 = plt.subplots(figsize=(10, 6))
 
-    # Flecha entre ambos puntos
-    ax.annotate(
-        "",
-        xy=(p_over, f_over),
-        xytext=(p_real, f_real),
-        arrowprops=dict(arrowstyle="<->", color="#FF9800", lw=2),
-    )
-    ax.text(
-        (p_real + p_over) / 2,
-        (f_real + f_over) / 2 - 0.03,
-        f"Δf* = {f_over - f_real:.0%}",
-        fontsize=13,
-        ha="center",
-        color="#FF9800",
-        fontweight="bold",
-    )
+    # ── G(K) vs K ─────────────────────────────────────────────────────────────
+    K_arr = np.linspace(1e-4, 0.52, 600)
+    G_arr = np.array([G(k) * 100 for k in K_arr])   # % por apuesta
 
-    ax.axhline(0, color="gray", linewidth=0.5)
-    ax.set_xlim(0, 0.7)
-    ax.set_ylim(-0.02, 0.65)
-    ax.legend(fontsize=14)
-    ax.grid(True, alpha=0.3)
+    ax1.fill_between(K_arr, G_arr, 0, where=(G_arr < 0),  alpha=0.12, color="red")
+    ax1.fill_between(K_arr, G_arr, 0, where=(G_arr >= 0), alpha=0.10, color="green")
+    ax1.axhline(0, color="gray", linewidth=0.8, linestyle="--", alpha=0.6)
+    ax1.plot(K_arr, G_arr, color="#2196F3", linewidth=2.5)
+
+    ann = [
+        (K_pts[0], g_vals[0]*100, "K = 6.25% → G = +0.74%/ap.",   0.04,  1.2),
+        (K_pts[1], g_vals[1]*100, "K = 12.5% → G = +0.12%/ap.",   0.04,  2.2),
+        (K_pts[2], g_vals[2]*100, "K = 37.5% → G = −12.3%/ap.", -0.26,  6.5),
+    ]
+    for (K_val, G_pct, text, dx, dy), color in zip(ann, colors):
+        ax1.plot(K_val, G_pct, "o", color=color, markersize=12, zorder=5)
+        ax1.annotate(text, xy=(K_val, G_pct),
+                     xytext=(K_val + dx, G_pct + dy),
+                     fontsize=12, color=color,
+                     arrowprops=dict(arrowstyle="->", color=color, lw=1.5))
+
+    ax1.set_xlabel("Fracción apostada $K$")
+    ax1.set_ylabel("Tasa de crecimiento $G(K)$  (% por apuesta)")
+    ax1.set_title(f"Crecimiento esperado — c real = {c_real:.0%},  dividendo = {dividendo}")
+    ax1.set_xlim(0, 0.52)
+    ax1.set_ylim(-20, 4)
+    ax1.grid(True, alpha=0.3)
+
     fig.tight_layout()
     fig.savefig(IMG_DIR / "kelly.svg", bbox_inches="tight")
     plt.close(fig)
@@ -116,14 +97,16 @@ def plot_adtech():
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
 
-    # Panel izquierdo: valor por impresión de cada cliente
+    # Panel izquierdo: valor por impresión de cada cliente (grouped bars, ambos positivos)
+    width = 0.4
     x = np.arange(n_slots)
-    ax1.bar(x, valor_a, alpha=0.7, label=f"Cliente A (CPC=${cpc_a:.1f})", color="#2196F3")
-    ax1.bar(x, -valor_b, alpha=0.7, label=f"Cliente B (CPC=${cpc_b:.1f})", color="#F44336")
-    ax1.axhline(0, color="gray", linewidth=0.5)
-    ax1.set_xlabel("Slot de inventario (ordenado)")
-    ax1.set_ylabel("Valor esperado por impresión ($)")
-    ax1.set_title("CTR × CPC por slot")
+    ax1.bar(x - width / 2, valor_a, width=width, alpha=0.8,
+            label=f"Cliente A (CPC=${cpc_a:.1f}, CTR≈15%)", color="#2196F3")
+    ax1.bar(x + width / 2, valor_b, width=width, alpha=0.8,
+            label=f"Cliente B (CPC=${cpc_b:.1f}, CTR≈25%)", color="#F44336")
+    ax1.set_xlabel("Slot de inventario (ordenado por ventaja de A)")
+    ax1.set_ylabel("Valor esperado por impresión (CTR × CPC, $)")
+    ax1.set_title("Valor por impresión — ambos clientes positivos")
     ax1.legend(fontsize=12)
     ax1.grid(True, alpha=0.3, axis="y")
 
