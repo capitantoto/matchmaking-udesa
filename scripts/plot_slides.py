@@ -95,19 +95,19 @@ def plot_adtech():
     valor_a = valor_a[order]
     valor_b = valor_b[order]
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 10))
 
     # Panel izquierdo: valor por impresión de cada cliente (grouped bars, ambos positivos)
     width = 0.4
     x = np.arange(n_slots)
     ax1.bar(x - width / 2, valor_a, width=width, alpha=0.8,
-            label=f"Cliente A (CPC=${cpc_a:.1f}, CTR≈15%)", color="#2196F3")
+            label=f"A  CPC=${cpc_a:.1f}, CTR≈15%", color="#2196F3")
     ax1.bar(x + width / 2, valor_b, width=width, alpha=0.8,
-            label=f"Cliente B (CPC=${cpc_b:.1f}, CTR≈25%)", color="#F44336")
-    ax1.set_xlabel("Slot de inventario (ordenado por ventaja de A)")
-    ax1.set_ylabel("Valor esperado por impresión (CTR × CPC, $)")
-    ax1.set_title("Valor por impresión — ambos clientes positivos")
-    ax1.legend(fontsize=12)
+            label=f"B  CPC=${cpc_b:.1f}, CTR≈25%", color="#F44336")
+    ax1.set_xlabel("Slot de inventario")
+    ax1.set_ylabel("Valor esperado ($)")
+    ax1.set_title("Valor por impresión")
+    ax1.legend()
     ax1.grid(True, alpha=0.3, axis="y")
 
     # Panel derecho: asignación óptima greedy
@@ -115,23 +115,20 @@ def plot_adtech():
     n_a = np.sum(winner == "A")
     n_b = np.sum(winner == "B")
 
-    budget_a = 15.0  # presupuesto diario
-    budget_b = 10.0
-
     # Sin restricción de presupuesto, A gana casi todo
     colors = ["#2196F3" if w == "A" else "#F44336" for w in winner]
     ax2.bar(x, np.where(winner == "A", valor_a, valor_b), color=colors, alpha=0.7)
     ax2.set_xlabel("Slot de inventario")
-    ax2.set_ylabel("Valor del slot asignado ($)")
+    ax2.set_ylabel("Valor asignado ($)")
     ax2.set_title(f"Asignación greedy: A={n_a} slots, B={n_b} slots")
 
     ax2.text(
         0.5, 0.85,
         f"A domina {n_a}/{n_slots} slots\nB sub-ejecuta su presupuesto",
         transform=ax2.transAxes,
-        fontsize=13,
+        fontsize=28,
         ha="center",
-        bbox=dict(boxstyle="round,pad=0.3", facecolor="#FFF9C4", alpha=0.9),
+        bbox=dict(boxstyle="round,pad=0.4", facecolor="#FFF9C4", alpha=0.9),
     )
     ax2.grid(True, alpha=0.3, axis="y")
 
