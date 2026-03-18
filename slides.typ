@@ -387,19 +387,26 @@ Max Weight, Scipy y Fuerza bruta coinciden (todos óptimos); GS pierde ~5%.
 
 == Predicciones vs. Realidad
 
-#image("img/pred_vs_real_comparison.svg")
+#image("img/pred_vs_real_comparison.svg", width: 100%)
 
-== Predicciones vs. Realidad — Pérdida
-
-Con 1000 usuarios (grafo bipartito, heterosexual):
-
-- *Gale-Shapley*: pierde ~11% de valor real
-- *Greedy*: pierde ~9%
-- *Max Weight / Scipy*: pierde ~12%
+#text(size: 16pt)[Óptimo real = lo que obtendríamos con las probabilidades verdaderas a mano (Scipy sobre $P_"mut"$).]
 
 #pause
 
-*Paradoja*: el óptimo global es el más frágil ante estimaciones imperfectas.
+#table(
+  columns: (2fr, 1fr, 1fr, 1fr),
+  inset: 7pt,
+  align: (left, center, center, center),
+  table.header([*Algoritmo*], [*Peso est.*], [*Peso real*], [*% óptimo*]),
+  [Gale-Shapley],    [137.8], [150.6], [89.4%],
+  [Greedy],          [142.9], [*153.2*], [*91.0%*],
+  [Max Weight],      [*151.1*], [148.8], [88.4%],
+  [Scipy bipartito], [*151.1*], [148.8], [88.4%],
+)
+
+#pause
+
+*Paradoja*: Max Weight maximiza el peso _estimado_ pero logra el menor peso _real_. \ Greedy, más conservador, supera a todos en términos efectivos.
 
 == Insights principales
 
