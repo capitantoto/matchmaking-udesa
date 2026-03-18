@@ -16,8 +16,58 @@
 // =============================================================================
 
 #title-slide(
-  author: [Gonzalo Barrera Borla \ Lic. Economía — MS Estadística \ _Rol actual, Empresa_],
-  title: "Data Science y Toma de Decisiones: Matchmaking",
+  title: "Si nos organizamos, nos enamoramos todos",
+  subtitle: [Data Science y toma de decisiones --- en aplicaciones de citas],
+  author: [Gonzalo Barrera Borla],
+  extra: [18 de marzo de 2026 — 19:30 \
+    MCD10 — Sem. de aplicaciones de ciencia de datos al ámbito privado \
+    Docente: Pablo Mislej — Universidad de San Andrés],
+)
+
+// =============================================================================
+// SECCIÓN 1b: Orador
+// =============================================================================
+
+== ¿Quién soy?
+
+#v(1fr)
+
+#text(size: 28pt)[
+  #set par(leading: 1.2em)
+  *Gonzalo Barrera Borla* \
+  Lic. en Economía — FCE, UBA \
+  (casi) Mg. en Estadística — FCEyN, UBA \
+  Data Scientist en *Sitch*
+]
+
+#v(2fr)
+
+#grid(
+  columns: (1fr, 1fr),
+  gutter: 3em,
+  align: center + horizon,
+  image("img/UBA-logo.svg", height: 6em),
+  image("img/sitch-logo.webp", height: 6em),
+)
+
+#v(1fr)
+
+== Sitch
+
+#grid(
+  columns: (3fr, 1fr),
+  gutter: 2em,
+  align: horizon,
+  [
+    - App de dating con matchmaking por *IA*
+    - Sin swipe: la IA aprende tus preferencias y propone candidatos con *contexto*
+    - Perfiles revisados por personas reales
+    - Cuando hay match mutuo, la IA presenta a los dos — y se retira
+
+    #v(0.5em)
+    #link("https://download.joinsitch.com/")[download.joinsitch.com]
+  ],
+  image("img/sitch-logo.webp", height: 5em),
 )
 
 // =============================================================================
@@ -56,11 +106,19 @@ Simplificación: 2 clientes compitiendo por el mismo público
 
 $ max sum_i "cpc"_i times "clicks"_i quad "s.a." quad sum_t "cpc"_i times x_(i,t) <= B_i $
 
+#text(size: 16pt)[
+- $x_(i,t) in {0,1}$: ¿se muestra el aviso del cliente $i$ en la impresión $t$?
+- $B_i$: presupuesto diario del cliente $i$
+- $"clicks"_i = sum_t x_(i,t) times "ctr"_(i,t)$: clics esperados (en valor esperado)
+]
+
 == Adtech: ¿qué pasa en la práctica?
 
 #image("img/adtech.svg")
 
 Cuando $"ctr"_A times "cpc"_A > "ctr"_B times "cpc"_B$ consistentemente, A se lleva casi todo el inventario y B sub-ejecuta su presupuesto.
+
+El problema general de bidding óptimo bajo restricciones de presupuesto tiene solución via dualidad de Lagrange @pita2019.
 
 // =============================================================================
 // SECCIÓN 2b: Horse Racing
@@ -68,26 +126,47 @@ Cuando $"ctr"_A times "cpc"_A > "ctr"_B times "cpc"_B$ consistentemente, A se ll
 
 == Carreras de caballos: Kelly Criterion
 
-¿Cuánto apostar si creemos conocer la probabilidad de ganar? #link("https://doi.org/10.1002/j.1538-7305.1956.tb03809.x")[(Kelly, 1956)]
+La fracción óptima maximiza el *crecimiento logarítmico esperado* del capital @kelly1956:
 
 $ K = frac("ventaja", "dividendo" - 1) quad "donde" quad "ventaja" = c times "dividendo" - 1 $
 
 #text(size: 16pt)[
-- $K$: fracción del capital a apostar
+- $K$: fracción del capital a apostar ($K < 0$ → no apostar)
 - $c$: probabilidad estimada de ganar (nuestro modelo)
 - $"dividendo"$: pago bruto por \$1 apostado (incluye la apuesta)
-- $"ventaja" = 0$: juego justo → no apostar; $"ventaja" > 0$: apostar proporcionalmente
+- $"ventaja" < 0$: juego desfavorable; $= 0$: juego justo; $> 0$: apostar $K$
 ]
 
 #pause
 
-*Problema*: las probabilidades son _interdependientes_ (algún caballo siempre gana) y _estimadas_ con error.
+*Advertencia* @benter1994: sobreestimar $c$ desplaza $K$ hacia arriba — apostar demasiado puede causar *crecimiento negativo* del capital.
 
-== Carreras: sensibilidad a la estimación
+== Carreras: consecuencias a largo plazo
 
-#image("img/kelly.svg")
+Kelly maximiza la *tasa de crecimiento logarítmico esperada* por apuesta:
 
-Sobreestimar la ventaja por más de un factor de 2 causa *crecimiento negativo* del capital — y es fácil hacerlo en la práctica. #link("https://gwern.net/doc/statistics/decision/1994-benter.pdf")[(Benter, 1994)]
+$ G(K) = c dot ln(1 + ("dividendo" - 1) dot K) + (1 - c) dot ln(1 - K) $
+
+#grid(
+  columns: (2fr, 1fr),
+  gutter: 1.5em,
+  align: horizon,
+  image("img/kelly.svg"),
+  [
+    #table(
+      columns: (auto, auto, auto, auto),
+      inset: 7pt,
+      align: center,
+      table.header(
+        [*$K$*], [*$c$ est.*], [*$G$/ap.*], [*×200 ap.*],
+      ),
+      [6.25%], [25%], [+0.74%], [×4.4],
+      [12.5%], [30%], [+0.12%], [×1.3],
+      [37.5%], [50%], [−12.3%], [ruina],
+    )
+    #text(size: 13pt)[c real = 25%, dividendo = 5]
+  ],
+)
 
 // =============================================================================
 // SECCIÓN 3: Matchmaking
@@ -109,20 +188,44 @@ Sobreestimar la ventaja por más de un factor de 2 causa *crecimiento negativo* 
 
 == Probabilidades direccionales vs. mutuas
 
-$ P(A arrow.r B) &: "qué tan bien B cumple las preferencias de A" $
-
-$ P(A arrow.l.r B) &approx P(A arrow.r B) times P(B arrow.r A) quad "(aprox.)" $
-
-#pause
-
-Pero la probabilidad mutua real tiene un término de correlación: la gente que "ofrece" lo que otros buscan, tiende a "buscar" cosas similares.
+La probabilidad mutua real tiene un término de correlación: la gente que "ofrece" lo que otros buscan, tiende a "buscar" cosas similares.
 
 $ P(A arrow.l.r B) != P(A arrow.r B) times P(B arrow.r A) $
 
+#pause
+
+Pero estimar $P(A arrow.l.r B)$ es más difícil que sólo $P(A arrow.r B)$, así que podemos asumir
+$ P(A arrow.l.r B) &approx P(A arrow.r B) times P(B arrow.r A) quad $
+
+#pause
+
+Y estimar probabilidades condicionales con un único estimador:
+
+$ P(A arrow.l.r B |  A arrow.r B ) = P(B arrow.r A) $
+
+#pagebreak()
+
+Cuando hay que tomar _decisiones_ con el modelo, esta interpretabilidad es muy útil...  #pause *¡aunque sea incorrecta!*.
+
+#v(0.5em)
+#align(right)[
+  #text(size: 16pt, style: "italic")[
+    "All models are wrong, but some are useful." — Box #cite(<box1976>)
+  ]
+]
+
 == Gale-Shapley: Stable Matching
 
-- Algoritmo clásico (Nobel 2012, Shapley & Roth)
-- Garantiza *estabilidad*: no hay par que prefiera cambiarse mutuamente
+Algoritmo clásico @gale1962; #link("https://www.nobelprize.org/prizes/economic-sciences/2012/popular-information/")[Nobel de Economía 2012] (Shapley & Roth)
+
+#text(size: 16pt)[
++ Cada A propone a su candidata favorita libre
++ Cada B acepta _provisoriamente_ al mejor proponente; rechaza al resto
++ Los rechazados proponen a su siguiente candidata
++ Repetir hasta que nadie quede sin pareja
+]
+
+Garantiza *estabilidad*: ningún par rechazado se preferiría mutuamente al par asignado.
 
 #pause
 
@@ -189,25 +292,55 @@ $ P(A arrow.l.r B) != P(A arrow.r B) times P(B arrow.r A) $
 
 == Datos sintéticos
 
-- *200 usuarios*, 6 dimensiones (belleza, poder adq., extroversión, intelectualidad, aventura, romanticismo)
+- *500 usuarios*, 6 dimensiones (belleza, poder adq., extroversión, intelectualidad, aventura, romanticismo)
 - Características con norma variable — algunos tienen "más de todo" ($r_"norma" = 0.92$ con atractivo recibido)
 - Preferencias normalizadas (dirección pura) con componente de atractivo universal
 - AUC $approx 0.74$ con Logistic Regression y Gradient Boosted Trees
 
-== Comparación principal (200 usuarios)
+== Comparación principal (500 usuarios)
 
-#image("img/matching_bar_chart.svg")
+#table(
+  columns: (2fr, 1fr, 1fr, 1fr, 1fr),
+  inset: 7pt,
+  align: (left, center, center, center, center),
+  table.header(
+    [*Algoritmo*], [*Pares*], [*Peso*], [*Tiempo*], [*% óptimo*],
+  ),
+  [Gale-Shapley],    [250], [70.8], [4ms],   [92.2%],
+  [Greedy],          [250], [72.9], [26ms],  [94.9%],
+  [Max Weight],      [250], [76.8], [12.3s], [100%],
+  [Scipy bipartito], [250], [76.8], [3ms],   [100%],
+)
 
-== Comparación completa (20 usuarios)
+== Comparación completa (30 usuarios)
 
-#image("img/matching_results_small_table.svg")
+Max Weight, Scipy y Fuerza bruta coinciden (todos óptimos); GS pierde ~6%.
 
-Max Weight supera el bipartito porque no está restringido a grupos.
-Fuerza bruta converge al óptimo bipartito en $<0.2$s sobre 20 usuarios.
+#table(
+  columns: (2fr, 1fr, 1fr, 1fr, 1fr),
+  inset: 7pt,
+  align: (left, center, center, center, center),
+  table.header(
+    [*Algoritmo*], [*Pares*], [*Peso*], [*Tiempo*], [*% óptimo*],
+  ),
+  [Gale-Shapley],    [15], [2.600], [< 0.1ms], [94.1%],
+  [Greedy],          [15], [2.752], [< 0.1ms], [99.6%],
+  [Max Weight],      [15], [2.763], [3ms],      [100%],
+  [Scipy bipartito], [15], [2.763], [< 0.1ms], [100%],
+  [Fuerza bruta],    [15], [2.763], [2.1s],     [100%],
+)
 
-== Matchings en el grafo
+== Matchings en el grafo — Gale-Shapley
 
-#image("img/matching_comparison.svg")
+#align(center)[#image("img/matching_gs.svg", height: 80%)]
+
+== Matchings en el grafo — Greedy
+
+#align(center)[#image("img/matching_greedy.svg", height: 80%)]
+
+== Matchings en el grafo — Max Weight
+
+#align(center)[#image("img/matching_mwm.svg", height: 80%)]
 
 == Predicciones vs. Realidad
 
@@ -215,12 +348,11 @@ Fuerza bruta converge al óptimo bipartito en $<0.2$s sobre 20 usuarios.
 
 == Predicciones vs. Realidad — Pérdida
 
-Con 200 usuarios:
+Con 500 usuarios (grafo bipartito, heterosexual):
 
-- *Gale-Shapley*: pierde ~6% de valor real
-- *Greedy*: pierde ~10%
-- *Scipy bipartito*: pierde ~14%
-- *Max Weight*: pierde ~16%
+- *Gale-Shapley*: pierde ~7% de valor real
+- *Greedy*: pierde ~6%
+- *Max Weight / Scipy*: pierde ~11%
 
 #pause
 
@@ -236,3 +368,37 @@ Con 200 usuarios:
 
 *Esto es la esencia de la toma de decisiones en data science*: optimizar el sistema completo, no cada componente por separado — pero siendo consciente de la calidad de nuestras estimaciones.
 
+// =============================================================================
+// Referencias
+// =============================================================================
+
+#focus-slide[
+  #show link: set text(white)
+
+  #text(size: 42pt)[*¡Muchas gracias!*]
+
+  #v(2em)
+
+  #grid(
+    columns: (1.8em, auto),
+    gutter: (1.2em, 0.9em),
+    align: horizon,
+    image("img/x-logo.svg",        height: 1.4em),
+    text(size: 22pt)[#link("https://twitter.com/capitantoto")[\@capitantoto]],
+    image("img/github-logo.svg",   height: 1.4em),
+    text(size: 22pt)[#link("https://github.com/capitantoto")[github.com/capitantoto]],
+    image("img/linkedin-logo.svg", height: 1.4em),
+    text(size: 22pt)[#link("https://ar.linkedin.com/in/gonzalo-barrera-borla-4a6b3711")[gonzalo-barrera-borla]],
+  )
+]
+
+// =============================================================================
+
+= Referencias
+
+== Bibliografía
+
+#text(size: 13pt)[
+  #set par(leading: 0.8em)
+  #bibliography("bib/references.bib", style: "apa", title: none)
+]
