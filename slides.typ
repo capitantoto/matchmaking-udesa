@@ -70,13 +70,13 @@ Cuando $"ctr"_A times "cpc"_A > "ctr"_B times "cpc"_B$ consistentemente, A se ll
 
 ¿Cuánto apostar si creemos conocer la probabilidad de ganar? #link("https://doi.org/10.1002/j.1538-7305.1956.tb03809.x")[(Kelly, 1956)]
 
-$ f^* = frac(b p - q, b) $
+$ K = frac("ventaja", "dividendo" - 1) quad "donde" quad "ventaja" = c times "dividendo" - 1 $
 
 #text(size: 16pt)[
-- $f^*$: fracción del capital a apostar
-- $b$: ganancia neta por unidad apostada (_odds_ del bookmaker menos 1)
-- $p$: probabilidad estimada de ganar
-- $q = 1 - p$: probabilidad estimada de perder
+- $K$: fracción del capital a apostar
+- $c$: probabilidad estimada de ganar (nuestro modelo)
+- $"dividendo"$: pago bruto por \$1 apostado (incluye la apuesta)
+- $"ventaja" = 0$: juego justo → no apostar; $"ventaja" > 0$: apostar proporcionalmente
 ]
 
 #pause
