@@ -116,7 +116,11 @@ $ max sum_i "cpc"_i times "clicks"_i quad "s.a." quad sum_t "cpc"_i times x_(i,t
 
 #image("img/adtech.svg")
 
+#pagebreak()
+
 Cuando $"ctr"_A times "cpc"_A > "ctr"_B times "cpc"_B$ consistentemente, A se lleva casi todo el inventario y B sub-ejecuta su presupuesto.
+
+#pause
 
 El problema general de bidding óptimo bajo restricciones de presupuesto tiene solución via dualidad de Lagrange @pita2019.
 
@@ -176,15 +180,34 @@ $ G(K) = c dot ln(1 + ("dividendo" - 1) dot K) + (1 - c) dot ln(1 - K) $
 
 == El problema del matchmaking
 
-- Plataforma de dating: hay que decidir qué perfiles mostrarle a cada usuario
-- Podemos estimar $P(A arrow.r B)$: probabilidad de que A apruebe a B
-- Queremos estimar $P(A arrow.l.r B)$: probabilidad de _match mutuo_
+Hay que decidir qué perfiles mostrarle a cada usuario _cada día_. 
+
+Es un problema *iterado*:
+  - el estado de hoy depende del estado de ayer.
+  - no es _tan_ importante resolverlo "de una" (_one-shot it_)
+#pause
+
+Múltiples objetivos divergentes:
+- Maximizar "engagement" de los usuarios (#math.arrow.double mostrar candidatos hegemónicos)
+- Maximizar parejas formadas (#math.arrow.double mostrar candidatos realistas)
 
 #pause
 
-*El dilema*: todos quieren a Brad Pitt / Penélope Cruz...
+- Maximizar crecimiento (#math.arrow.double no cobrar/modelo "freemium")
+- Maximizar ingreso bruto/neto  (#math.arrow.double "paywall")
 
-...pero BP/PC no van a querer a todos.
+#pagebreak()
+
+- *Queremos* estimar $P(A arrow.l.r B)$: probabilidad de _match mutuo_
+#pause
+- *Podemos* estimar $P(A arrow.r B)$: probabilidad de que A apruebe a B
+
+#pause
+
+*Dilema*: las probabilidades son *asimétricas*.
+
+
+Todos quieren a Brad Pitt / Penélope Cruz ... #pause pero ellos no quieren a todos.
 
 == Probabilidades direccionales vs. mutuas
 
@@ -232,7 +255,8 @@ Garantiza *estabilidad*: ningún par rechazado se preferiría mutuamente al par 
 *Problema en dating*:
 - Requiere "aprobar temporariamente" candidatos — no aplica
 - Optimiza estabilidad, no bienestar global
-- El matching estable puede ser muy desigual
+- El matching estable puede ser muy desigual \
+  #text(size: 16pt, style: "italic")[El lado que _propone_ obtiene su mejor pareja estable posible; el que _recibe_, su peor.]
 
 == Greedy Matching
 
