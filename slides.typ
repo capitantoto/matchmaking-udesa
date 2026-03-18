@@ -288,11 +288,25 @@ En grafos generales: blossom de Edmonds (más lento, no necesario aquí).]
 
 - Formulación genérica: optimización combinatoria relajada
 - Flexible — se puede cambiar la función objetivo fácilmente
-- Límite de iteraciones ($approx 1000$) para que sea práctico
+- Pocas iteraciones (50–100 suelen bastar), pero *cada iteración es costosa*
 
 #pause
 
 *Trade-off*: se acerca al óptimo pero no lo garantiza, y es más lento
+
+#pause
+
+#text(size: 16pt)[
+  ¿Por qué no simplemente enumerar todos los matchings posibles? Para $n = 250$ usuarios por grupo:
+  #table(
+    columns: (auto, auto, auto),
+    inset: 6pt,
+    align: (left, center, left),
+    table.header([*Método*], [*Operaciones*], [*Factible?*]),
+    [Húngaro],  [$250^3 approx 1.6 times 10^7$], [Sí — milisegundos],
+    [Exhaustivo], [$250! approx 10^{491}$],        [No — el universo tiene $approx 10^{80}$ átomos],
+  )
+]
 
 == Comparación de enfoques
 
