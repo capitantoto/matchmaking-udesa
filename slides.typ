@@ -260,9 +260,9 @@ Garantiza *estabilidad*: ningún par rechazado se preferiría mutuamente al par 
 
 == Greedy Matching
 
-- Ordenar aristas por $P(A arrow.l.r B)$ descendente
-- Agregar si ambos nodos están libres
-- Garantiza $>= 1/2$ del óptimo (_1/2-aproximación_)
++ Ordenar aristas por $P(A arrow.l.r B)$ descendente
++ Agregar si ambos nodos están libres
++ Garantiza en teoría $>= 1/2$ del óptimo (_1/2-aproximación_) #footnote[#pause pero en la práctica suele ser mucho mejor.]
 
 #pause
 
