@@ -40,19 +40,3 @@ make slides
 # Limpiar artefactos
 make clean
 ```
-
-### Compilar a mano (sin Make)
-
-```bash
-# 1. Ejecutar el notebook (genera todos los gráficos en img/)
-uv run jupyter nbconvert --to notebook --execute matchmaking.ipynb \
-    --output matchmaking.ipynb --ExecutePreprocessor.timeout=900
-
-# 2. Compilar slides en español
-uv run typst compile slides.typ                                        # con pausas
-uv run typst compile --input handout=true slides.typ slides_handout.pdf  # sin pausas
-
-# 3. Compilar slides en inglés
-uv run typst compile slides_en.typ
-uv run typst compile --input handout=true slides_en.typ slides_en_handout.pdf
-```
