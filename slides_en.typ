@@ -16,8 +16,58 @@
 // =============================================================================
 
 #title-slide(
-  author: [Gonzalo Barrera Borla \ B.A. Economics — M.S. Statistics \ _Current Role, Company_],
-  title: "Data Science and Decision-Making: Matchmaking",
+  title: "Si nos organizamos, nos enamoramos todos",
+  subtitle: [Data Science and decision-making --- in dating applications],
+  author: [Gonzalo Barrera Borla],
+  extra: [March 18, 2026 — 19:30 \
+    MCD10 — Applications of data science in the private sector \
+    Instructor: Pablo Mislej — Universidad de San Andrés],
+)
+
+// =============================================================================
+// SECTION 1b: Speaker
+// =============================================================================
+
+== Who am I?
+
+#v(1fr)
+
+#text(size: 28pt)[
+  #set par(leading: 1.2em)
+  *Gonzalo Barrera Borla* \
+  B.A. Economics — FCE, UBA \
+  (almost) M.S. Statistics — FCEyN, UBA \
+  Data Scientist at *Sitch*
+]
+
+#v(2fr)
+
+#grid(
+  columns: (1fr, 1fr),
+  gutter: 3em,
+  align: center + horizon,
+  image("img/UBA-logo.svg", height: 6em),
+  image("img/sitch-logo.webp", height: 6em),
+)
+
+#v(1fr)
+
+== Sitch
+
+#grid(
+  columns: (3fr, 1fr),
+  gutter: 2em,
+  align: horizon,
+  [
+    - Dating app with *AI-powered* matchmaking
+    - No swiping: the AI learns your preferences and suggests candidates with *context*
+    - Profiles reviewed by real people
+    - When there's a mutual match, the AI introduces both — and steps aside
+
+    #v(0.5em)
+    #link("https://download.joinsitch.com/")[download.joinsitch.com]
+  ],
+  image("img/sitch-logo.webp", height: 5em),
 )
 
 // =============================================================================
@@ -37,7 +87,7 @@
 Three domains where this is clear:
 
 + *Adtech*: Which ad do I show?
-+ *Horse racing*: Which horse do I bet on?
++ *Horse racing*: How much do I bet?
 + *Matchmaking*: Which pairs do I present?
 
 // =============================================================================
@@ -56,11 +106,23 @@ Simplified: 2 clients competing for the same audience
 
 $ max sum_i "cpc"_i times "clicks"_i quad "s.t." quad sum_t "cpc"_i times x_(i,t) <= B_i $
 
+#text(size: 16pt)[
+- $x_(i,t) in {0,1}$: show client $i$'s ad on impression $t$?
+- $B_i$: daily budget for client $i$
+- $"clicks"_i = sum_t x_(i,t) times "ctr"_(i,t)$: expected clicks
+]
+
 == Adtech: what happens in practice?
 
 #image("img/adtech.svg")
 
+#pagebreak()
+
 When $"ctr"_A times "cpc"_A > "ctr"_B times "cpc"_B$ consistently, A captures nearly all inventory and B under-spends its budget.
+
+#pause
+
+The general optimal bidding problem under budget constraints can be solved via Lagrange duality @pita2019.
 
 // =============================================================================
 // SECTION 2b: Horse Racing
@@ -68,26 +130,47 @@ When $"ctr"_A times "cpc"_A > "ctr"_B times "cpc"_B$ consistently, A captures ne
 
 == Horse racing: Kelly Criterion
 
-How much to bet when we think we know the probability of winning? #link("https://doi.org/10.1002/j.1538-7305.1956.tb03809.x")[(Kelly, 1956)]
+The optimal fraction maximizes the *expected logarithmic growth* of capital @kelly1956:
 
 $ K = frac("edge", "odds" - 1) quad "where" quad "edge" = c times "odds" - 1 $
 
 #text(size: 16pt)[
-- $K$: fraction of capital to bet
+- $K$: fraction of capital to bet ($K < 0$ → don't bet)
 - $c$: estimated probability of winning (our model)
 - $"odds"$: gross payout per \$1 bet (stake included)
-- $"edge" = 0$: fair game → don't bet; $"edge" > 0$: bet proportionally
+- $"edge" < 0$: unfavorable game; $= 0$: fair game; $> 0$: bet $K$
 ]
 
 #pause
 
-*Problem*: probabilities are _interdependent_ (some horse always wins) and _estimated_ with error.
+*Warning* @benter1994: overestimating $c$ pushes $K$ upward — betting too much can cause *negative capital growth*.
 
-== Horse racing: sensitivity to estimation
+== Horse racing: long-run consequences
 
-#image("img/kelly.svg")
+Kelly maximizes the *expected log growth rate* per bet:
 
-Overestimating the edge by more than a factor of 2 causes *negative capital growth* — and it's easy to do in practice. #link("https://gwern.net/doc/statistics/decision/1994-benter.pdf")[(Benter, 1994)]
+$ G(K) = c dot ln(1 + ("odds" - 1) dot K) + (1 - c) dot ln(1 - K) $
+
+#grid(
+  columns: (2fr, 1fr),
+  gutter: 1.5em,
+  align: horizon,
+  image("img/kelly.svg"),
+  [
+    #table(
+      columns: (auto, auto, auto, auto),
+      inset: 7pt,
+      align: center,
+      table.header(
+        [*$K$*], [*$c$ est.*], [*$G$/bet*], [*×200 bets*],
+      ),
+      [6.25%], [25%], [+0.74%], [×4.4],
+      [12.5%], [30%], [+0.12%], [×1.3],
+      [37.5%], [50%], [−12.3%], [ruin],
+    )
+    #text(size: 13pt)[c real = 25%, odds = 5]
+  ],
+)
 
 // =============================================================================
 // SECTION 3: Matchmaking
@@ -97,45 +180,89 @@ Overestimating the edge by more than a factor of 2 causes *negative capital grow
 
 == The matchmaking problem
 
-- Dating platform: we must decide which profiles to show each user
-- We can estimate $P(A arrow.r B)$: probability that A approves of B
-- We want to estimate $P(A arrow.l.r B)$: probability of a _mutual match_
+We must decide which profiles to show each user _every day_.
+
+It is an *iterated* problem:
+  - today's state depends on yesterday's state.
+  - it's not _that_ important to solve it "one-shot"
+#pause
+
+Multiple divergent objectives:
+- Maximize user engagement (#math.arrow.double show aspirational candidates)
+- Maximize matches formed (#math.arrow.double show realistic candidates)
 
 #pause
 
-*The dilemma*: everyone wants Brad Pitt / Penélope Cruz...
+- Maximize growth (#math.arrow.double don't charge / "freemium" model)
+- Maximize gross/net revenue (#math.arrow.double paywall)
 
-...but BP/PC won't want everyone back.
+#pagebreak()
+
+- *We want* to estimate $P(A arrow.l.r B)$: probability of _mutual match_
+#pause
+- *We can* estimate $P(A arrow.r B)$: probability that A approves of B
+
+#pause
+
+*Dilemma*: probabilities are *asymmetric*.
+
+
+Everyone wants Brad Pitt / Penélope Cruz ... #pause but they don't want everyone back.
 
 == Directional vs. mutual probabilities
 
-$ P(A arrow.r B) &: "how well B meets A's preferences" $
-
-$ P(A arrow.l.r B) &approx P(A arrow.r B) times P(B arrow.r A) quad "(approx.)" $
-
-#pause
-
-But the true mutual probability has a correlation term: people who "offer" what others seek tend to "seek" similar things themselves.
+The true mutual probability has a correlation term: people who "offer" what others seek tend to "seek" similar things themselves.
 
 $ P(A arrow.l.r B) != P(A arrow.r B) times P(B arrow.r A) $
 
+#pause
+
+But estimating $P(A arrow.l.r B)$ is harder than just $P(A arrow.r B)$, so we can assume
+$ P(A arrow.l.r B) &approx P(A arrow.r B) times P(B arrow.r A) quad $
+
+#pause
+
+And estimate conditional probabilities with a single estimator:
+
+$ P(A arrow.l.r B |  A arrow.r B ) = P(B arrow.r A) $
+
+#pagebreak()
+
+When making _decisions_ with the model, this interpretability is very useful...  #pause *even if it's wrong!*.
+
+#v(0.5em)
+#align(right)[
+  #text(size: 16pt, style: "italic")[
+    "All models are wrong, but some are useful." — Box #cite(<box1976>)
+  ]
+]
+
 == Gale-Shapley: Stable Matching
 
-- Classic algorithm (Nobel 2012, Shapley & Roth)
-- Guarantees *stability*: no pair would both prefer to switch to each other
+Classic algorithm @gale1962; #link("https://www.nobelprize.org/prizes/economic-sciences/2012/popular-information/")[Nobel Prize in Economics 2012] (Shapley & Roth)
+
+#text(size: 16pt)[
++ Each A proposes to their top available candidate
++ Each B tentatively accepts the best proposer; rejects the rest
++ Rejected As propose to their next candidate
++ Repeat until everyone is paired
+]
+
+Guarantees *stability*: no rejected pair would both prefer to switch to each other.
 
 #pause
 
 *Problems in dating*:
 - Requires "tentatively accepting" candidates — doesn't apply
 - Optimizes stability, not global welfare
-- The stable matching can be very unequal
+- The stable matching can be very unequal \
+  #text(size: 16pt, style: "italic")[The _proposing_ side gets their best stable partner; the _receiving_ side gets their worst.]
 
 == Greedy Matching
 
-- Sort edges by $P(A arrow.l.r B)$ descending
-- Add edge if both nodes are free
-- Guarantees $>= 1/2$ of optimal (_1/2-approximation_)
++ Sort edges by $P(A arrow.l.r B)$ descending
++ Add edge if both nodes are free
++ Guarantees in theory $>= 1/2$ of optimal (_1/2-approximation_) #footnote[#pause but in practice it's usually much better.]
 
 #pause
 
@@ -152,20 +279,39 @@ $ P(A arrow.l.r B) != P(A arrow.r B) times P(B arrow.r A) $
 
 *Counterintuitive insight*: the globally optimal matching may NOT include the pair with the highest individual probability
 
+#pause
+
+#text(size: 16pt)[For bipartite graphs: *Hungarian algorithm* @kuhn1955 — O($n^3$), exact. \
+For general graphs: Edmonds' blossom algorithm (slower, not needed here).]
+
 == Brute force with `scipy.minimize`
 
 - Generic formulation: relaxed combinatorial optimization
 - Flexible — the objective function can be changed easily
-- Iteration limit ($approx 1000$) to keep it practical
+- Few iterations needed (50–100 usually suffice), but *each iteration is expensive*
 
 #pause
 
 *Trade-off*: approaches the optimum but doesn't guarantee it, and is slower
 
+#pause
+
+#text(size: 16pt)[
+  Why not simply enumerate all possible matchings? For $n = 500$ users per group:
+  #table(
+    columns: (auto, auto, auto),
+    inset: 6pt,
+    align: (left, center, left),
+    table.header([*Method*], [*Operations*], [*Feasible?*]),
+    [Hungarian],   [$500^3 approx 1.25 times 10^8$], [Yes — seconds],
+    [Exhaustive],  [$500! approx 10^{1134}$],         [No — the universe has $approx 10^{80}$ atoms],
+  )
+]
+
 == Comparing approaches
 
 #table(
-  columns: (auto, auto, auto, auto),
+  columns: (1fr, 1fr, 1fr, 1fr),
   inset: 8pt,
   align: (left, center, center, center),
   table.header(
@@ -189,41 +335,78 @@ $ P(A arrow.l.r B) != P(A arrow.r B) times P(B arrow.r A) $
 
 == Synthetic data
 
-- *200 users*, 6 dimensions (beauty, wealth, extraversion, intellect, adventure, romance)
+- *1000 users*, 6 dimensions (beauty, wealth, extraversion, intellect, adventure, romance)
 - Features with variable norm — some users have "more of everything" ($r_"norm" = 0.92$ with received attractiveness)
 - Normalized preferences (pure direction) with a universal attractiveness component
 - AUC $approx 0.74$ with Logistic Regression and Gradient Boosted Trees
 
-== Main comparison (200 users)
+== Main comparison (1000 users)
 
-#image("img/matching_bar_chart.svg")
+#table(
+  columns: (2fr, 1fr, 1fr, 1fr, 1fr),
+  inset: 7pt,
+  align: (left, center, center, center, center),
+  table.header(
+    [*Algorithm*], [*Pairs*], [*Weight*], [*Time*], [*% optimal*],
+  ),
+  [Gale-Shapley],    [500], [137.8], [20ms],  [91.2%],
+  [Greedy],          [500], [142.9], [148ms], [94.6%],
+  [Max Weight],      [500], [151.1], [107s],  [100%],
+  [Scipy bipartite], [500], [151.1], [13ms],  [100%],
+)
 
-== Full comparison (20 users)
+== Full comparison (40 users)
 
-#image("img/matching_results_small_table.svg")
+Max Weight, Scipy and Brute force agree (all optimal); GS loses ~5%.
 
-Max Weight and Scipy bipartite agree (both optimal for bipartite graphs).
-Brute force converges to the same optimum in $<0.2$s on 20 users.
+#table(
+  columns: (2fr, 1fr, 1fr, 1fr, 1fr),
+  inset: 7pt,
+  align: (left, center, center, center, center),
+  table.header(
+    [*Algorithm*], [*Pairs*], [*Weight*], [*Time*], [*% optimal*],
+  ),
+  [Gale-Shapley],    [20], [4.432], [< 0.1ms], [94.6%],
+  [Greedy],          [20], [4.485], [< 0.1ms], [95.7%],
+  [Max Weight],      [20], [4.687], [6ms],      [100%],
+  [Scipy bipartite], [20], [4.687], [< 0.1ms], [100%],
+  [Brute force],     [20], [4.687], [7.3s],     [100%],
+)
 
-== Matchings in the graph
+== Matchings in the graph — Gale-Shapley
 
-#image("img/matching_comparison.svg")
+#image("img/matching_gs.svg", width: 100%)
+
+== Matchings in the graph — Greedy
+
+#image("img/matching_greedy.svg", width: 100%)
+
+== Matchings in the graph — Max Weight
+
+#image("img/matching_mwm.svg", width: 100%)
 
 == Predictions vs. Reality
 
-#image("img/pred_vs_real_comparison.svg")
+#image("img/pred_vs_real_comparison.svg", width: 100%)
 
-== Predictions vs. Reality — Loss
-
-With 200 users (bipartite graph, heterosexual):
-
-- *Gale-Shapley*: loses ~7% of real value
-- *Greedy*: loses ~9%
-- *Max Weight / Scipy*: loses ~16%
+#text(size: 16pt)[Real optimum = what we'd get with the true probabilities in hand (Scipy on $P_"mut"$).]
 
 #pause
 
-*Paradox*: the globally optimal algorithm is the most fragile to imperfect estimates.
+#table(
+  columns: (2fr, 1fr, 1fr, 1fr),
+  inset: 7pt,
+  align: (left, center, center, center),
+  table.header([*Algorithm*], [*Est. weight*], [*Real weight*], [*% optimal*]),
+  [Gale-Shapley],    [137.8], [150.6], [89.4%],
+  [Greedy],          [142.9], [*153.2*], [*91.0%*],
+  [Max Weight],      [*151.1*], [148.8], [88.4%],
+  [Scipy bipartite], [*151.1*], [148.8], [88.4%],
+)
+
+#pause
+
+*Paradox*: Max Weight maximizes _estimated_ weight but achieves the lowest _real_ weight. \ Greedy, more conservative, outperforms all in effective terms.
 
 == Key takeaways
 
@@ -234,3 +417,38 @@ With 200 users (bipartite graph, heterosexual):
 #pause
 
 *This is the essence of decision-making in data science*: optimize the whole system, not each component in isolation — but stay aware of the quality of your estimates.
+
+// =============================================================================
+// References
+// =============================================================================
+
+#focus-slide[
+  #show link: set text(white)
+
+  #text(size: 42pt)[*Thank you!*]
+
+  #v(2em)
+
+  #grid(
+    columns: (1.8em, auto),
+    gutter: (1.2em, 0.9em),
+    align: horizon,
+    image("img/x-logo.svg",        height: 1.4em),
+    text(size: 22pt)[#link("https://twitter.com/capitantoto")[\@capitantoto]],
+    image("img/github-logo.svg",   height: 1.4em),
+    text(size: 22pt)[#link("https://github.com/capitantoto")[github.com/capitantoto]],
+    image("img/linkedin-logo.svg", height: 1.4em),
+    text(size: 22pt)[#link("https://ar.linkedin.com/in/gonzalo-barrera-borla-4a6b3711")[gonzalo-barrera-borla]],
+  )
+]
+
+// =============================================================================
+
+= References
+
+== Bibliography
+
+#text(size: 13pt)[
+  #set par(leading: 0.8em)
+  #bibliography("bib/references.bib", style: "apa", title: none)
+]
