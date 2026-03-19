@@ -1,24 +1,14 @@
-# Matchmaking UdeSA — Notebook para charla universitaria
+# Matchmaking UdeSA — Charla universitaria
 
 ## Qué es este proyecto
 
-Notebook de Jupyter para una charla de 1h20 (45min + 25min Q&A) sobre el trabajo de un data scientist en una plataforma de matchmaking (dating). Enfocado en estadística aplicada. Para presentar en clase y entregar después — no se usa interactivamente.
-
-## Estado actual
-
-- Diseño aprobado en `docs/plans/2026-03-12-matchmaking-notebook-design.md`
-- Pendiente: implementación del notebook
-
-## Decisiones de diseño
-
-- Dominio: dating, 100 usuarios, 6 dimensiones
-- Idioma: todo en español (markdown, comentarios). Variables de código en inglés.
-- Libs especializadas OK, pero siempre incluir implementación alternativa con libs comunes
-- Fuerza bruta con scipy.minimize usa límite de iteraciones (no exhaustivo)
-- Comparar: Gale-Shapley vs. max weight matching vs. brute force
+Notebook de Jupyter (`matchmaking.ipynb`) y presentación en Typst (`slides.typ` / `slides_en.typ`) para una charla sobre data science aplicado a matchmaking (dating). Charla de 1h20 (45min + 25min Q&A) en UdeSA, MCD10.
 
 ## Convenciones
 
+- Idioma: español en markdown/comentarios/slides. Variables de código en inglés.
 - Un solo notebook `.ipynb` con todo el pipeline end-to-end
-- Secciones bien marcadas con markdown headers para navegar durante la presentación
-- Visualizaciones claras y grandes (para proyectar en pantalla)
+- Visualizaciones grandes (para proyectar en pantalla)
+- Los SVGs de los slides se generan desde `scripts/plot_slides.py` (adtech, kelly) y desde el notebook (matchings, comparaciones)
+- Slides en Typst/touying 0.6.2 (tema metropolis)
+- Bibliografía en `bib/references.bib`, citada con `@clave` en Typst
