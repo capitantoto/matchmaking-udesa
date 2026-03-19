@@ -9,6 +9,6 @@ Notebook de Jupyter (`matchmaking.ipynb`) y presentación en Typst (`slides.typ`
 - Idioma: español en markdown/comentarios/slides. Variables de código en inglés.
 - Un solo notebook `.ipynb` con todo el pipeline end-to-end
 - Visualizaciones grandes (para proyectar en pantalla)
-- Los SVGs de los slides se generan desde `scripts/plot_slides.py` (adtech, kelly) y desde el notebook (matchings, comparaciones)
+- Todos los SVGs de los slides se generan desde el notebook (matchings, comparaciones, adtech, kelly)
 - Slides en Typst/touying 0.6.2 (tema metropolis)
 - Bibliografía en `bib/references.bib`, citada con `@clave` en Typst
