@@ -2,8 +2,10 @@
 
 #import themes.metropolis: *
 
+#let handout-mode = sys.inputs.at("handout", default: "false") == "true"
 #show: metropolis-theme.with(
-  footer: [Matchmaking — UdeSA 2026]
+  config-common(handout: handout-mode),
+  footer: [Matchmaking — UdeSA 2026],
 )
 #show link: set text(blue)
 #show link: underline
